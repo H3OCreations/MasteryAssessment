@@ -11,6 +11,16 @@ class MainMenu(tk.Tk):
     def __init__(self, *args, **kwargs):
         tk.Tk.__init__(self, *args, **kwargs)
 
+        self.directories = [os.getcwd() + "\\" + "Units",
+                            os.getcwd() + "\\" + "Past Data"
+                            ]
+
+        for folder in self.directories:
+            if os.path.isdir(folder):
+                pass
+        else:
+            os.mkdir(folder)
+
         self.top_frame = tk.Frame(self, bg='cyan', width=450, height=50, pady=3)
         self.center_frame = tk.Frame(self, bg='gray2', width=50, height=40, padx=3, pady=3)
         self.bottom_frame = tk.Frame(self, bg='white', width=450, height=45, pady=3)
@@ -21,9 +31,6 @@ class MainMenu(tk.Tk):
 
         title = tk.Label(self.top_frame, text = "Welcome")
         title.pack()
-        self.directories = [os.getcwd() + "\\" + "Units",
-                            os.getcwd() + "\\" + "Past Data"
-                            ]
 
         self.directoryList = self.listSections()
 
@@ -52,13 +59,7 @@ class MainMenu(tk.Tk):
         Initializes directories by creating file structures the program will use 
         for the program itself
         '''
-        
-        for folder in self.directories:
-            if os.path.isdir(folder):
-                pass
-            else:
-                os.mkdir(folder)
-            
+                    
         # Set up the student data and format the directories for student Data
         tk.messagebox.showinfo("Alert", "Select the TeachAssist Classlist")  
         classListPath = filedialog.askopenfilename(initialdir = os.getcwd(), title = "Select Class list", filetypes = (("CSV files", "*.csv"),("TXT files", "*.txt"), ("All files", "*.*")))
