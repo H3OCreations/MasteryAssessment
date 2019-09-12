@@ -16,10 +16,12 @@ class MainMenu(tk.Tk):
                             ]
 
         for folder in self.directories:
-            if os.path.isdir(folder):
+            try:
+                os.mkdir(folder)
+                
+            except FileExistsError:
                 pass
-        else:
-            os.mkdir(folder)
+
 
         self.top_frame = tk.Frame(self, bg='cyan', width=450, height=50, pady=3)
         self.center_frame = tk.Frame(self, bg='gray2', width=50, height=40, padx=3, pady=3)
