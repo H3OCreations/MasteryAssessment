@@ -22,7 +22,6 @@ class MainMenu(tk.Tk):
             except FileExistsError:
                 pass
 
-
         self.top_frame = tk.Frame(self, bg='cyan', width=450, height=50, pady=3)
         self.center_frame = tk.Frame(self, bg='gray2', width=50, height=40, padx=3, pady=3)
         self.bottom_frame = tk.Frame(self, bg='white', width=450, height=45, pady=3)
@@ -47,6 +46,9 @@ class MainMenu(tk.Tk):
         calculateButton = tk.Button(self.center_frame, text = "Calculate Marks", width = 15, pady = 10)
         calculateButton.bind("<Button-1>", self.calculateData)
         calculateButton.grid(row = 3)
+
+        #selectedFile = tk.Label(self.top_frame, text = "String")
+
             
         exitButton = tk.Button(self.bottom_frame, text = "Exit", width = 15)
         exitButton.bind("<Button-1>", self.exitWindow)
@@ -94,8 +96,9 @@ class MainMenu(tk.Tk):
 
                 for i in range(0, len(fileData)):
                     if "-" in fileData[i][0]:
-                        fileData[i][0] = fileData[i][0].replace("-", "~")
-
+                        if "-" in fileData[i][0][:3]:
+                            fileData[i][0] = fileData[i][0].replace("-", "~", 1)
+            
             return fileData
 
         def writeFiles(assessmentData, classList):

@@ -156,4 +156,36 @@ class PageTwo(tk.Frame):
 
 
     def savePage(self, event):
-        pass
+        outputData = []
+        for row in self.frameData:
+            outputRow = []
+            for cell in row:
+                try:
+                    outputRow.append(cell.getText())
+                    
+                except AttributeError:
+                    # Ignores cells when they're not input buttons
+                    #print("An exception was made")
+                    outputRow.append(cell.get())
+                    
+            if len(outputRow) < 2:
+                # Ignores rows not a part of the assessment data
+                pass
+            else:
+                outputData.append(outputRow)
+
+        appendCount = 0
+
+        for line in self.fileData[:self.lineBreak]:
+            try:
+                # Sometimes, lines are empty and will cause an index error
+                if "~" in line[0] and "~" == line[0][0]:
+                    num = self.fileData.index(line)
+                    self.fileData[self.fileData.index(line)] = [line[0]] + outputData[appendCount]
+                    appendCount = appendCount + 1
+            except IndexError:
+                pass
+
+        with open(self.fileName, 'w') as file:
+            writer = csv.writer(file)
+            writer.writerows(self.fileData) 

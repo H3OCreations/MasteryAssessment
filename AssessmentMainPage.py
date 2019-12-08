@@ -62,6 +62,7 @@ class TopFrame(tk.Frame):
         tk.Frame.__init__(self, parent)
         self.parent = parent
         self.controller = controller
+        self.buttonClicked = False
         self.directories = [os.getcwd() + "\\" + "Units",
                         os.getcwd() + "\\" + "Past Data"
                         ]
@@ -122,16 +123,25 @@ class TopFrame(tk.Frame):
                                             column = 6, 
                                             padx = 20, 
                                             pady = 5)   
+        # Force the raise to see if this fixes the page change bug                                    
+        #self.controller.show_frame(self.studentList[0] + "PageOne")
+
     def nextStudent(self, event):
         try:           
-            nextStudent = self.studentList[self.studentList.index(self.getSelectedStudent()) + 1] 
+            nextStudent = self.studentList[self.studentList.index(self.getSelectedStudent()) + 1]
             self.controller.show_frame(nextStudent + "PageOne")
-            self.studentMenu.tkvar.set(nextStudent)
-
+            if self.buttonClicked == False:
+                self.buttonClicked = True
+            else:
+                pass
+                #self.studentMenu.tkvar.set(nextStudent)
+        
         except IndexError:
             self.controller.show_frame(self.studentList[0] + "PageOne")
             self.studentMenu.tkvar.set(self.studentList[0])
 
+        self.studentMenu.tkvar.set(nextStudent)
+    
     def previousStudent(self, event):
         try:           
             previousStudent = self.studentList[self.studentList.index(self.getSelectedStudent()) - 1] 
@@ -155,7 +165,7 @@ class TopFrame(tk.Frame):
         return self.studentMenu.selected
    
 ################################################################################
-#                                   Bottom Frame                                  #
+#                                   Bottom Frame                               #
 ################################################################################  
 class BottomFrame(tk.Frame):
 
