@@ -3,7 +3,7 @@ import tkinter as tk
 from InputTools import *
 from AssessmentPageOne import *
 from AssessmentPageTwo import *
-from MainMenu import *
+#from MainMenu import *
 
 
 class AssessmentPage(tk.Tk):
@@ -33,6 +33,8 @@ class AssessmentPage(tk.Tk):
         self.frames = {}
 
         for i in range(0, len(classList)):
+            # In the future, create a system that queues the next two charts in each direction
+            # allow it to update as the next button is clicked and delete the outer most charts
             for F in (PageOne, PageTwo):
                 page_name = classList[i] + F.__name__
                 frame = F(parent=container, path = files[i], controller=self)
@@ -43,10 +45,11 @@ class AssessmentPage(tk.Tk):
                 # will be the one that is visible.
                 #frame.grid(row=0, column=0, sticky="nsew")
 
-        self.show_frame(classList[0] + "PageOne")
+        
 
-        self.current_student = top_frame.getSelectedStudent()
+        self.current_student = classList[0]
         self.current_page = "PageOne"
+        self.show_frame(self.current_student + self.current_page)
 
     def show_frame(self, page_name):
         '''Show a frame for the given page name'''
@@ -62,10 +65,7 @@ class TopFrame(tk.Frame):
         tk.Frame.__init__(self, parent)
         self.parent = parent
         self.controller = controller
-        self.buttonClicked = False
-        self.directories = [os.getcwd() + "\\" + "Units",
-                        os.getcwd() + "\\" + "Past Data"
-                        ]
+
         # Dependancies on Dropdown Menus
         
         '''
@@ -128,23 +128,18 @@ class TopFrame(tk.Frame):
 
     def nextStudent(self, event):
         try:           
-            nextStudent = self.studentList[self.studentList.index(self.getSelectedStudent()) + 1]
+            nextStudent = self.studentList[self.studentList.index(self.studentMenu.selected) + 1]
             self.controller.show_frame(nextStudent + "PageOne")
-            if self.buttonClicked == False:
-                self.buttonClicked = True
-            else:
-                pass
-                #self.studentMenu.tkvar.set(nextStudent)
-        
+            
         except IndexError:
-            self.controller.show_frame(self.studentList[0] + "PageOne")
-            self.studentMenu.tkvar.set(self.studentList[0])
+            nextStudent = self.studentList[0]
+            self.controller.show_frame(nextStudent + "PageOne")
 
         self.studentMenu.tkvar.set(nextStudent)
     
     def previousStudent(self, event):
         try:           
-            previousStudent = self.studentList[self.studentList.index(self.getSelectedStudent()) - 1] 
+            previousStudent = self.studentList[self.studentList.index(self.studentMenu.selected) - 1] 
             self.controller.show_frame(previousStudent + "PageOne")
             self.studentMenu.tkvar.set(previousStudent)
 
@@ -157,12 +152,12 @@ class TopFrame(tk.Frame):
         pass
 
     def switchStudentChart(self, *args):
-        self.controller.current_student = self.getSelectedStudent()
+        self.controller.current_student = self.studentMenu.tkvar.get()
         self.controller.current_page = "PageOne"
         self.controller.show_frame(self.controller.current_student + self.controller.current_page)
+        
 
-    def getSelectedStudent(self):
-        return self.studentMenu.selected
+
    
 ################################################################################
 #                                   Bottom Frame                               #
@@ -174,8 +169,8 @@ class BottomFrame(tk.Frame):
         self.controller = controller
         self.parent = parent
         self.switchButton = tk.Button(self, 
-                                    text = "Next Page", 
-                                   width = 15)
+                                text = "Next Page", 
+                                width = 15)
         self.switchButton.bind("<Button-1>", self.switchPage)
         self.switchButton.pack(side = "right")
         
