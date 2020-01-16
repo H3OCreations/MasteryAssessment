@@ -11,17 +11,15 @@ class MainMenu(tk.Tk):
     def __init__(self, *args, **kwargs):
         tk.Tk.__init__(self, *args, **kwargs)
 
-        self.directories = [os.getcwd() + "\\" + "Units",
-                            os.getcwd() + "\\" + "Past Data"
+        # Makes sure that the directories we wish to access are present
+        self.workingDirectory = os.getcwd()
+        self.directories = [self.workingDirectory + "\\Units",
+                            self.workingDirectory + "\\Past Data"
                             ]
-
         for folder in self.directories:
-            try:
+            if not os.path.isdir(folder):
                 os.mkdir(folder)
-                
-            except FileExistsError:
-                pass
-
+       
         self.top_frame = tk.Frame(self, bg='cyan', width=450, height=50, pady=3)
         self.center_frame = tk.Frame(self, bg='gray2', width=50, height=40, padx=3, pady=3)
         self.bottom_frame = tk.Frame(self, bg='white', width=450, height=45, pady=3)
@@ -46,10 +44,7 @@ class MainMenu(tk.Tk):
         calculateButton = tk.Button(self.center_frame, text = "Calculate Marks", width = 15, pady = 10)
         calculateButton.bind("<Button-1>", self.calculateData)
         calculateButton.grid(row = 3)
-
-        #selectedFile = tk.Label(self.top_frame, text = "String")
-
-            
+           
         exitButton = tk.Button(self.bottom_frame, text = "Exit", width = 15)
         exitButton.bind("<Button-1>", self.exitWindow)
         exitButton.pack(side = "right")
@@ -81,7 +76,14 @@ class MainMenu(tk.Tk):
         className = classListPath[-delim1:-delim2]
         classDirectory = unitDirectory + "\\" + className
         
+        # Function is protected within the initialization function (for some reason, I decided this)
+        # The reason is probably to reuse the variables within the initialize function
         def cleanData(fileName):
+            '''
+            The function takes in the target .csv file and removes all the formatting from the
+            direct copy and paste from word to excel.  It also ensures that all  rows are the 
+            exact same length 
+            '''
             with open(fileName , encoding = "utf-8", errors = "ignore") as file:
                 fileReader = csv.reader(file)
                 fileData = list(fileReader)
@@ -101,7 +103,11 @@ class MainMenu(tk.Tk):
             
             return fileData
 
+        # Also one of the protected functions within the initialize function
         def writeFiles(assessmentData, classList):
+            '''
+            The function copies the cleaned assessment chart and renames them the student name
+            '''
             assessmentData = cleanData(assessmentData)
             
             with open(classList, "r") as file:
@@ -118,17 +124,17 @@ class MainMenu(tk.Tk):
                 for row in assessmentData:
                     writer.writerow(row)
                 newFile.close()     
-
+        
+        # Here is where we create the file directories
         try:
             os.mkdir(unitDirectory)
             try:
                 os.mkdir(classDirectory)
                 writeFiles(chartTemplatePath, classListPath)
-                                
+                tk.messagebox.showinfo("Done", "Initialization Complete!")  
             except FileExistsError:
                 tk.messagebox.showinfo("Alert", "This unit has already been created.  To reinitialize a unit, you must delete the %s class folder" %(className))
 
-            tk.messagebox.showinfo("Done", "Initialization Complete!")        
         except FileExistsError:
             try:
                 os.mkdir(classDirectory)
@@ -162,7 +168,7 @@ class MainMenu(tk.Tk):
                 text = "Select The Unit, then Click OK", 
                 bg = "black", 
                 fg = "white").grid(row = 1, column = 2)
-        units = self.directoryList[0]
+        units = self.listSections()[0]
         
         self.unitMenu = DropdownMenu(self.center_frame, "Unit Name", units, 2, rw = 2)
         
@@ -178,8 +184,8 @@ class MainMenu(tk.Tk):
         text = "Select The Section, then Click OK", 
         bg = "black", 
         fg = "white").grid(row = 1, column = 3)
-        classSection = self.directoryList[1]
-        self.sectionMenu = DropdownMenu(self.center_frame, "Section Number", classSection[0], 3, rw = 2)
+        classSection = self.listSections()[2]
+        self.sectionMenu = DropdownMenu(self.center_frame, "Section Number", self.listSections()[1][0], 3, rw = 2)
         
         okButton = tk.Button(self.center_frame, 
                         text = "OK", 
@@ -195,7 +201,6 @@ class MainMenu(tk.Tk):
         classPath = os.getcwd() + "\\Units\\" + unitChart + "\\"  + classSection
         self.destroy()
         configInfo = [unitChart, classSection, classList]
-        print (classPath)
         app = AssessmentPage(classPath, configInfo)
 
     def calculateData(self, event):
