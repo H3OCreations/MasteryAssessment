@@ -1,4 +1,4 @@
-import os, csv, math, random, collections, fileinput, shutil, sys
+import os, csv, shutil, sys
 import tkinter as tk
 import tkinter.messagebox
 from tkinter import filedialog  
@@ -6,6 +6,7 @@ from datetime import datetime
 
 # Custom package import
 from AssessmentMainPage import *
+from MasteryTools import *
 
 class MainMenu(tk.Tk):
     def __init__(self, *args, **kwargs):
@@ -13,10 +14,10 @@ class MainMenu(tk.Tk):
 
         # Makes sure that the directories we wish to access are present
         self.workingDirectory = os.getcwd()
-        self.directories = [self.workingDirectory + "\\Units",
+        self.subdirectories = [self.workingDirectory + "\\Units",
                             self.workingDirectory + "\\Past Data"
                             ]
-        for folder in self.directories:
+        for folder in self.subdirectories:
             if not os.path.isdir(folder):
                 os.mkdir(folder)
        
@@ -68,7 +69,7 @@ class MainMenu(tk.Tk):
         # formatting for unit path name
         delim = (chartTemplatePath[::-1]).index("/")
         unitName = chartTemplatePath[-delim:-4]
-        unitDirectory = self.directories[0] + "\\" + unitName
+        unitDirectory = self.subdirectories[0] + "\\" + unitName
         
         # formatting for section path name
         delim1 = (classListPath[::-1]).index("/")
@@ -149,15 +150,15 @@ class MainMenu(tk.Tk):
         #Unit                                       | Unit               
         #{section: classlist, section: classlist}   |   {section: classlist, section: classlist} 
         
-        unitList = os.listdir(self.directories[0])
+        unitList = os.listdir(self.subdirectories[0])
         sectionRow = []
         sectionGroups = []
         for unit in unitList:
-            sectionList = os.listdir(self.directories[0] + "\\" + unit)
+            sectionList = os.listdir(self.subdirectories[0] + "\\" + unit)
             sectionRow.append(sectionList)
             sectionDict = {}
             for section in sectionList:
-                sectionDict[section] = os.listdir(self.directories[0] + "\\" + unit + "\\" + section)
+                sectionDict[section] = os.listdir(self.subdirectories[0] + "\\" + unit + "\\" + section)
             sectionGroups.append(sectionDict)
 
         df = [unitList, sectionRow, sectionGroups]
@@ -212,7 +213,7 @@ class MainMenu(tk.Tk):
         archiveName = datetime.now()
         archiveName = archiveName.strftime("%Y-%m-%d-(%H-%M)")
         try:
-            backupName = self.directories[1] + "\\" + archiveName
+            backupName = self.subdirectories[1] + "\\" + archiveName
             os.mkdir(backupName)
         except FileExistsError:
             response = tk.messagebox.askquestion("Archive Error", "Your Data has been archived today already.  Would you like to override today's existing archive?")

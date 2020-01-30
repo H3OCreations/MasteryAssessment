@@ -1,9 +1,8 @@
-import os, csv, math, random, collections, fileinput, shutil, sys
+import os, csv
 import tkinter as tk
 from InputTools import *
 from AssessmentPageOne import *
 from AssessmentPageTwo import *
-#from MainMenu import *
 
 
 class AssessmentPage(tk.Tk):
@@ -38,24 +37,34 @@ class AssessmentPage(tk.Tk):
             for F in (PageOne, PageTwo):
                 page_name = classList[i] + F.__name__
                 frame = F(parent=container, path = files[i], controller=self)
-                self.frames[page_name] = frame
-
-                # put all of the pages in the same location;
-                # the one on the top of the stacking order
-                # will be the one that is visible.
-                #frame.grid(row=0, column=0, sticky="nsew")
-
-        
+                self.frames[page_name] = frame       
 
         self.current_student = classList[0]
+        self.previous_student = self.current_student
+
         self.current_page = "PageOne"
+        self.previous_page = self.current_page
+
         self.show_frame(self.current_student + self.current_page)
+
 
     def show_frame(self, page_name):
         '''Show a frame for the given page name'''
         frame = self.frames[page_name]
+        
+        # Autosave Feature
+        self.frames[self.previous_student + self.previous_page].save()
+        # Allow for a delay in the saving
+        self.previous_student = self.current_student
+        self.previous_page = self.current_page
+        
         frame.grid(row=0, column=0, sticky="nsew")
+        self.title(self.current_student + self.current_page)
         frame.tkraise()
+        
+
+        
+
 ################################################################################
 #                                   Top Frame                                  #
 ################################################################################  
@@ -135,18 +144,22 @@ class TopFrame(tk.Frame):
             nextStudent = self.studentList[0]
             self.controller.show_frame(nextStudent + "PageOne")
 
+        self.controller.current_student = nextStudent
         self.studentMenu.tkvar.set(nextStudent)
     
     def previousStudent(self, event):
         try:           
             previousStudent = self.studentList[self.studentList.index(self.studentMenu.selected) - 1] 
             self.controller.show_frame(previousStudent + "PageOne")
-            self.studentMenu.tkvar.set(previousStudent)
 
         except IndexError:
             # Just in case
-            self.controller.show_frame(self.studentList[0] + "PageOne")
-            self.studentMenu.tkvar.set(self.studentList[0])
+            previousStudent = self.studentList[0]
+            self.controller.show_frame(previousStudent + "PageOne")
+            
+        self.controller.current_student = previousStudent
+        self.studentMenu.tkvar.set(previousStudent)
+        
 
     def visualizeData(self, event):
         pass

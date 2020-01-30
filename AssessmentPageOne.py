@@ -1,4 +1,4 @@
-import os, csv, math, random, sys
+import csv
 import tkinter as tk
 from InputTools import *
 
@@ -24,6 +24,15 @@ class PageOne(tk.Frame):
         bottom_frame = tk.Frame(self, bg = "black")
         bottom_frame.grid(row = 2)
 
+        # Instructions for bottom 
+        bottom_label = tk.Label(bottom_frame, 
+                                text = "Currently, the first page will not save unless you use this button", 
+                                fg = "black", 
+                                bg = "white", 
+                                font = ('arial', 11), 
+                                width = 93, 
+                                anchor = "w")
+        bottom_label.pack()
         # Temporary to keep track of what file the object is accessing and the save feature
         saveButton = tk.Button(bottom_frame, text = "Save")
         saveButton.bind("<Button-1>", self.savePage)
@@ -34,9 +43,10 @@ class PageOne(tk.Frame):
             self.fileData = list(fileReader)
             # Cleaning out all blank lines
             self.fileData = [value for value in self.fileData if value != []]
-        
+
         # Temporarily declare linebreak for exiting the creation stage
         self.lineBreak = -1
+        KICA = ["Knowledge", "Thinking", "Communication", "Application"]
 
         for rowNum in range(len(self.fileData)):
             # For the sake of not having to reindex self.fileData over and over
@@ -71,18 +81,33 @@ class PageOne(tk.Frame):
                     if len(row[columnNum]) == 0:
                         pass
                     else:
-                        strandLabel = tk.Label(self.center_frame, 
-                                            text = row[columnNum], 
-                                            borderwidth = 1, 
-                                            relief = "solid", 
-                                            fg = "black", 
-                                            bg = "white", 
-                                            font = ('arial', 11), 
-                                            width = 93, 
-                                            anchor = "w")
-                        strandLabel.grid(row = rowNum, 
-                                        column = columnNum, 
-                                        sticky = "W")
+                        # Testing to see whether we can update the KICA box into an entry box for filler
+                        assessment_box = False
+                        if "[" in row[columnNum] and "]" in row[columnNum]:
+                                assessment_box = True
+                        if assessment_box:
+                            # Width is currently hardcoded until we "get" the regular length
+                            assessment_entry = tk.Entry(self.center_frame,    
+                                                width = 140,               
+                                                relief = "solid",
+                                                bg = "light grey")
+                            assessment_entry.insert(0, self.fileData[rowNum][columnNum])
+                            assessment_entry.grid(row = rowNum,
+                                            column = columnNum)
+                            self.fileData[rowNum][columnNum] = assessment_entry
+                        else:
+                            strandLabel = tk.Label(self.center_frame, 
+                                                text = row[columnNum], 
+                                                borderwidth = 1, 
+                                                relief = "solid", 
+                                                fg = "black", 
+                                                bg = "white", 
+                                                font = ('arial', 11), 
+                                                width = 93, 
+                                                anchor = "w")
+                            strandLabel.grid(row = rowNum, 
+                                            column = columnNum, 
+                                            sticky = "W")
 
                 ################################################################################
                 #                               Middle Columns                                 #
@@ -139,6 +164,7 @@ class PageOne(tk.Frame):
             noteBox = tk.Entry(self.center_frame,
                                 borderwidth = 1,
                                 relief = "solid",
+                                bg = "light grey",
                                 width = 15)
             noteBox.insert(0, self.fileData[rowNum][columnNum])
             noteBox.grid(row = rowNum,
@@ -171,6 +197,9 @@ class PageOne(tk.Frame):
                 
                 # Input Button logic
                 if isinstance(value, InputButton):
+                    # Add section to reset the colour and input status of button
+                    #value.setColour("white")
+                    #value.resetState()     # This is not a real function at this moment
                     self.fileData[rowNum][columnNum] = value.getText()
 
                 # Entry for the note column
@@ -181,4 +210,35 @@ class PageOne(tk.Frame):
         with open(self.fileName, 'w') as file:
             writer = csv.writer(file)
             writer.writerows(self.fileData) 
+        print(self.fileName, "SAVED with button")
         
+
+    def save(self):
+        '''
+        The save function has two stages.  The first is to clean self.fileData back from a 2D list
+        of objects into a list of primitives.
+        Note that we ignore all the Tkinter labels since we have left the string fields untouched 
+        when populating the labels
+        '''
+        for rowNum in range(len(self.fileData)):
+            row = self.fileData[rowNum]
+            for columnNum in range(len(row)):
+                value = row[columnNum]
+                
+                # Input Button logic
+                if isinstance(value, InputButton):
+                    # Add section to reset the colour and input status of button
+                    #value.setColour("white")
+                    #value.resetState()     # This is not a real function at this moment
+                    self.fileData[rowNum][columnNum] = value.getText()
+
+                # Entry for the note column
+                elif isinstance(value, tk.Entry):
+                    self.fileData[rowNum][columnNum] = value.get()
+        
+        # Writes file to .csv 
+        with open(self.fileName, 'w') as file:
+            writer = csv.writer(file)
+            writer.writerows(self.fileData) 
+
+        print(self.fileName, "AUTOSAVED")
