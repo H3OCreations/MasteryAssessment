@@ -1,4 +1,4 @@
-import os, csv, collections, pandas
+import os, csv, collections
 
 class MasteryTools:
     # take in the file name to create the object with visualization and file reading 
