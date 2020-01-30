@@ -72,8 +72,8 @@ class InputButton(tk.Frame):
         if self.count > 3:
             self.count = 0
 
-        def getText(self):
-            return self.text
+      def getText(self):
+          return self.text
 
 
 
