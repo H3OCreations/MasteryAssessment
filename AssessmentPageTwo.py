@@ -21,9 +21,9 @@ class PageTwo(tk.Frame):
         bottom_frame.grid(row = 2)
 
         # Temporary to keep track of what file the object is accessing and the save feature
-        saveButton = tk.Button(bottom_frame, text = "Save")
-        saveButton.bind("<Button-1>", self.savePage)
-        saveButton.pack()
+        #saveButton = tk.Button(bottom_frame, text = "Save")
+        #saveButton.bind("<Button-1>", self.savePage)
+        #saveButton.pack()
 
         self.fileName = path
         with open(self.fileName, 'r') as file:
@@ -68,10 +68,10 @@ class PageTwo(tk.Frame):
 
                     # Placing the assessment strand text
                     if len(row[0]) == 0 and (row[1].isspace() or len(row[1]) == 0):
-                        continue
+                        break
                     
                     elif len(row[0]) == 0:
-                        pass
+                        break
                     else:
                         tk.Label(self.center_frame, 
                                 text = row[0], 
@@ -179,4 +179,33 @@ class PageTwo(tk.Frame):
         with open(self.fileName, 'w') as file:
             writer = csv.writer(file)
             writer.writerows(self.fileData) 
+            
+    def save(self):
+        '''
+        The save function has two stages.  The first is to clean self.fileData back from a 2D list
+        of objects into a list of primitives.
+        Note that we ignore all the Tkinter labels since we have left the string fields untouched 
+        when populating the labels
+        '''
+        for rowNum in range(len(self.fileData)):
+            row = self.fileData[rowNum]
+            for columnNum in range(len(row)):
+                value = row[columnNum]
+                
+                # Input Button logic
+                if isinstance(value, InputButton):
+                    # Add section to reset the colour and input status of button
+                    #value.setColour("white")
+                    #value.resetState()     # This is not a real function at this moment
+                    self.fileData[rowNum][columnNum] = value.getText()
+
+                # Entry for the note column
+                elif isinstance(value, tk.Entry):
+                    self.fileData[rowNum][columnNum] = value.get()
         
+        # Writes file to .csv 
+        with open(self.fileName, 'w') as file:
+            writer = csv.writer(file)
+            writer.writerows(self.fileData) 
+
+        #print(self.fileName, "AUTOSAVED")

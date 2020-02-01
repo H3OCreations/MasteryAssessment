@@ -125,6 +125,9 @@ class MainMenu(tk.Tk):
                 for row in assessmentData:
                     writer.writerow(row)
                 newFile.close()     
+
+            # Cloning a random file to get around the current saving issue    
+            shutil.copyfile(fileName, classDirectory + "\\0_Template.csv")
         
         # Here is where we create the file directories
         try:

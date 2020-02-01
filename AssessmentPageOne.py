@@ -32,11 +32,11 @@ class PageOne(tk.Frame):
                                 font = ('arial', 11), 
                                 width = 93, 
                                 anchor = "w")
-        bottom_label.pack()
+        #bottom_label.pack()
         # Temporary to keep track of what file the object is accessing and the save feature
-        saveButton = tk.Button(bottom_frame, text = "Save")
-        saveButton.bind("<Button-1>", self.savePage)
-        saveButton.pack()
+        #saveButton = tk.Button(bottom_frame, text = "Save")
+        #saveButton.bind("<Button-1>", self.savePage)
+        #saveButton.pack()
 
         with open(self.fileName, 'r') as file:
             fileReader = csv.reader(file)
@@ -75,11 +75,12 @@ class PageOne(tk.Frame):
                     # Placing the assessment strand text and omiting blank lines at the end 
                     # of the file before communication section
                     if len(row) == 0 and (row[columnNum + 1].isspace() or len(row[columnNum + 1]) == 0):
-                        continue
+                        break
 
                     # Omits the blank lines
                     if len(row[columnNum]) == 0:
-                        pass
+                        break
+
                     else:
                         # Testing to see whether we can update the KICA box into an entry box for filler
                         assessment_box = False
@@ -210,7 +211,7 @@ class PageOne(tk.Frame):
         with open(self.fileName, 'w') as file:
             writer = csv.writer(file)
             writer.writerows(self.fileData) 
-        print(self.fileName, "SAVED with button")
+        #print(self.fileName, "SAVED with button")
         
 
     def save(self):
@@ -241,4 +242,4 @@ class PageOne(tk.Frame):
             writer = csv.writer(file)
             writer.writerows(self.fileData) 
 
-        print(self.fileName, "AUTOSAVED")
+        #print(self.fileName, "AUTOSAVED")
