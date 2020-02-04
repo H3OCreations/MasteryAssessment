@@ -127,7 +127,7 @@ class MainMenu(tk.Tk):
                 newFile.close()     
 
             # Cloning a random file to get around the current saving issue    
-            shutil.copyfile(fileName, classDirectory + "\\0_Template.csv")
+            shutil.copyfile(fileName, classDirectory + "\\AAAAA_Template.csv")
         
         # Here is where we create the file directories
         try:
@@ -209,6 +209,11 @@ class MainMenu(tk.Tk):
 
     def calculateData(self, event):
         # Export csv with all calculated marks
+        classDirectory = unitDirectory + "\\" + className
+        classList = os.listdir(classDirectory)
+        
+        #for file in classList:
+        #    export = Mastery(classDirectory +
         # Export all chart pdfs
         # Export all radar diagrams
         

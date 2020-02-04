@@ -33,16 +33,16 @@ class PageTwo(tk.Frame):
 
         # Initializing variables 
         applicationRows = False
-        continueRow = -1
+        self.continueRow = -1
 
 
         # Search for the row to start writing from
         for i in range(0, len(self.fileData)):
             if "Communication" in self.fileData[i][0]:
-                continueRow = i
+                self.continueRow = i
                 break
 
-        for rowNum in range(continueRow,len(self.fileData)):
+        for rowNum in range(self.continueRow,len(self.fileData)):
             # For the sake of not having to reindex self.fileData over and over
             row = self.fileData[rowNum]
 
@@ -154,14 +154,14 @@ class PageTwo(tk.Frame):
                         width = 13,
                         ).grid(row = rowNum,
                             column = columnNum + 1)  
-
+    '''
     def savePage(self, event):
-        '''
-        The save function has two stages.  The first is to clean self.fileData back from a 2D list
-        of objects into a list of primitives.
-        Note that we ignore all the Tkinter labels since we have left the string fields untouched 
-        when populating the labels
-        '''
+        
+        #The save function has two stages.  The first is to clean self.fileData back from a 2D list
+        #of objects into a list of primitives.
+        #Note that we ignore all the Tkinter labels since we have left the string fields untouched 
+        #when populating the labels
+        
         for rowNum in range(len(self.fileData)):
             row = self.fileData[rowNum]
             for columnNum in range(len(row)):
@@ -179,7 +179,7 @@ class PageTwo(tk.Frame):
         with open(self.fileName, 'w') as file:
             writer = csv.writer(file)
             writer.writerows(self.fileData) 
-            
+    '''        
     def save(self):
         '''
         The save function has two stages.  The first is to clean self.fileData back from a 2D list
@@ -187,7 +187,7 @@ class PageTwo(tk.Frame):
         Note that we ignore all the Tkinter labels since we have left the string fields untouched 
         when populating the labels
         '''
-        for rowNum in range(len(self.fileData)):
+        for rowNum in range(self.continueRow, len(self.fileData)):
             row = self.fileData[rowNum]
             for columnNum in range(len(row)):
                 value = row[columnNum]
@@ -203,9 +203,19 @@ class PageTwo(tk.Frame):
                 elif isinstance(value, tk.Entry):
                     self.fileData[rowNum][columnNum] = value.get()
         
+        self.mergeData()
         # Writes file to .csv 
         with open(self.fileName, 'w') as file:
             writer = csv.writer(file)
             writer.writerows(self.fileData) 
 
-        #print(self.fileName, "AUTOSAVED")
+    def mergeData(self):
+        with open(self.fileName, "r") as file:
+            fileReader = csv.reader(file)
+            cloneData = list(fileReader)
+            cloneData = [value for value in cloneData if value != []]
+            
+            for i in range(self.continueRow, len(cloneData)):
+                if cloneData[i] != self.fileData[i]:
+                    cloneData[i] = self.fileData[i]
+        self.fileData = cloneData

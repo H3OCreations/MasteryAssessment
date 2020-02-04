@@ -183,14 +183,14 @@ class PageOne(tk.Frame):
                         ).grid(row = rowNum,
                             column = columnNum + 1)  
         
-
+    '''
     def savePage(self, event):
-        '''
-        The save function has two stages.  The first is to clean self.fileData back from a 2D list
-        of objects into a list of primitives.
-        Note that we ignore all the Tkinter labels since we have left the string fields untouched 
-        when populating the labels
-        '''
+        
+        #The save function has two stages.  The first is to clean self.fileData back from a 2D list
+        #of objects into a list of primitives.
+        #Note that we ignore all the Tkinter labels since we have left the string fields untouched 
+        #when populating the labels
+        
         for rowNum in range(len(self.fileData)):
             row = self.fileData[rowNum]
             for columnNum in range(len(row)):
@@ -212,7 +212,7 @@ class PageOne(tk.Frame):
             writer = csv.writer(file)
             writer.writerows(self.fileData) 
         #print(self.fileName, "SAVED with button")
-        
+    '''
 
     def save(self):
         '''
@@ -221,6 +221,7 @@ class PageOne(tk.Frame):
         Note that we ignore all the Tkinter labels since we have left the string fields untouched 
         when populating the labels
         '''
+
         for rowNum in range(len(self.fileData)):
             row = self.fileData[rowNum]
             for columnNum in range(len(row)):
@@ -237,9 +238,27 @@ class PageOne(tk.Frame):
                 elif isinstance(value, tk.Entry):
                     self.fileData[rowNum][columnNum] = value.get()
         
+        self.mergeData()
         # Writes file to .csv 
         with open(self.fileName, 'w') as file:
             writer = csv.writer(file)
+            writer.writerows(self.fileData)
+            '''
             writer.writerows(self.fileData) 
-
+            for lines in self.fileName[:self.lineBreak]:
+                writer.writerows(lines) 
+            for lines in tempData[self.lineBreak:]:
+                writer.writerows(lines)
+            '''
         #print(self.fileName, "AUTOSAVED")
+
+    def mergeData(self):
+        with open(self.fileName, "r") as file:
+            fileReader = csv.reader(file)
+            cloneData = list(fileReader)
+            cloneData = [value for value in cloneData if value != []]
+            
+            for i in range(self.lineBreak):
+                if cloneData[i] != self.fileData[i]:
+                    cloneData[i] = self.fileData[i]
+        self.fileData = cloneData
