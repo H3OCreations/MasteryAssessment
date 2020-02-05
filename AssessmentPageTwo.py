@@ -2,7 +2,6 @@ import os, csv, math, random, sys
 import tkinter as tk
 from InputTools import *
 
-
 class PageTwo(tk.Frame):
     
     def __init__(self, parent, path, controller):
@@ -154,32 +153,7 @@ class PageTwo(tk.Frame):
                         width = 13,
                         ).grid(row = rowNum,
                             column = columnNum + 1)  
-    '''
-    def savePage(self, event):
-        
-        #The save function has two stages.  The first is to clean self.fileData back from a 2D list
-        #of objects into a list of primitives.
-        #Note that we ignore all the Tkinter labels since we have left the string fields untouched 
-        #when populating the labels
-        
-        for rowNum in range(len(self.fileData)):
-            row = self.fileData[rowNum]
-            for columnNum in range(len(row)):
-                value = row[columnNum]
-                
-                # Input Button logic
-                if isinstance(value, InputButton):
-                    self.fileData[rowNum][columnNum] = value.getText()
-
-                # Entry for the note column
-                elif isinstance(value, tk.Entry):
-                    self.fileData[rowNum][columnNum] = value.get()
-        
-        # Writes file to .csv 
-        with open(self.fileName, 'w') as file:
-            writer = csv.writer(file)
-            writer.writerows(self.fileData) 
-    '''        
+  
     def save(self):
         '''
         The save function has two stages.  The first is to clean self.fileData back from a 2D list

@@ -2,7 +2,6 @@ import csv
 import tkinter as tk
 from InputTools import *
 
-
 class PageOne(tk.Frame):
     
     def __init__(self, parent, path, controller):
@@ -231,7 +230,7 @@ class PageOne(tk.Frame):
                 if isinstance(value, InputButton):
                     # Add section to reset the colour and input status of button
                     #value.setColour("white")
-                    #value.resetState()     # This is not a real function at this moment
+                    #value.count = 0     # This is a sloppy solution to access the attribute
                     self.fileData[rowNum][columnNum] = value.getText()
 
                 # Entry for the note column
@@ -243,14 +242,6 @@ class PageOne(tk.Frame):
         with open(self.fileName, 'w') as file:
             writer = csv.writer(file)
             writer.writerows(self.fileData)
-            '''
-            writer.writerows(self.fileData) 
-            for lines in self.fileName[:self.lineBreak]:
-                writer.writerows(lines) 
-            for lines in tempData[self.lineBreak:]:
-                writer.writerows(lines)
-            '''
-        #print(self.fileName, "AUTOSAVED")
 
     def mergeData(self):
         with open(self.fileName, "r") as file:

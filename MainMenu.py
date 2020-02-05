@@ -172,7 +172,10 @@ class MainMenu(tk.Tk):
                 text = "Select The Unit, then Click OK", 
                 bg = "black", 
                 fg = "white").grid(row = 1, column = 2)
-        units = self.listSections()[0]
+        
+        # Refresh directory list just in case new directories were initialized
+        self.directoryList = self.listSections()
+        units = self.listSections()[0]      # Need to fix this over-call on listSections now that directories is fixes
         
         self.unitMenu = DropdownMenu(self.center_frame, "Unit Name", units, 2, rw = 2)
         
@@ -208,21 +211,24 @@ class MainMenu(tk.Tk):
         app = AssessmentPage(classPath, configInfo)
 
     def calculateData(self, event):
-        # Export csv with all calculated marks
-        classDirectory = unitDirectory + "\\" + className
-        classList = os.listdir(classDirectory)
+        ''' Export csv with all calculated marks'''
         
-        #for file in classList:
-        #    export = Mastery(classDirectory +
-        # Export all chart pdfs
-        # Export all radar diagrams
+        # Identifies path for calculations to execute
+        tk.messagebox.showinfo("Alert", "Select the folder witht he class's unit you wish to calculate")  
+        unitPath = filedialog.askdirectory(initialdir = self.subdirectories[0], title = "Select Class")
         
-        # archive data
+        # Ittereatively calculating the marks for each csv
+        for file in os.listdir(unitPath):
+            filePath = unitPath + "//" + file
+            MasteryTools(filePath).save_results()
+
+        # Backing up data into archive directory
         archiveName = datetime.now()
-        archiveName = archiveName.strftime("%Y-%m-%d-(%H-%M)")
+        archiveName = archiveName.strftime("%Y-%m-%d-(%H-%M)") 
         try:
-            backupName = self.subdirectories[1] + "\\" + archiveName
-            os.mkdir(backupName)
+            backupName = self.subdirectories[1] + "\\" + archiveName 
+            #os.mkdir(backupName)
+            shutil.copytree(unitPath, backupName)
         except FileExistsError:
             response = tk.messagebox.askquestion("Archive Error", "Your Data has been archived today already.  Would you like to override today's existing archive?")
             # If user clicks 'Yes' then it returns "yes" else it returns 'no'
