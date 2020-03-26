@@ -30,10 +30,9 @@ class PageTwo(tk.Frame):
             self.fileData = list(fileReader)
             self.fileData = [value for value in self.fileData if value != []]
 
-        # Initializing variables 
-        applicationRows = False
         self.continueRow = -1
-
+        self.applicationRows = False    # Flips a switch to allow for application to append the same way
+                                        # the rest of page one does
 
         # Search for the row to start writing from
         for i in range(0, len(self.fileData)):
@@ -62,8 +61,6 @@ class PageTwo(tk.Frame):
                     
                     if "[" in row[0]:
                         self.assessmentLine = False
-                    
-                    startNum = 2    # What is this for?
 
                     # Placing the assessment strand text
                     if len(row[0]) == 0 and (row[1].isspace() or len(row[1]) == 0):
@@ -72,18 +69,33 @@ class PageTwo(tk.Frame):
                     elif len(row[0]) == 0:
                         break
                     else:
-                        tk.Label(self.center_frame, 
-                                text = row[0], 
-                                borderwidth = 1, 
-                                relief = "solid", 
-                                fg = "black", 
-                                bg = "white", 
-                                font = ('arial', 11), 
-                                width = 93, 
-                                anchor = "w",
-                                ).grid(row = rowNum, 
-                                        column = columnNum, 
-                                        sticky = "W")
+                         # Testing to see whether we can update the KICA box into an entry box for filler
+                        assessment_box = False
+                        if "[" in row[columnNum] and "]" in row[columnNum]:
+                                assessment_box = True
+                        if assessment_box:
+                            # Width is currently hardcoded until we "get" the regular length
+                            assessment_entry = tk.Entry(self.center_frame,    
+                                                width = 140,               
+                                                relief = "solid",
+                                                bg = "light grey")
+                            assessment_entry.insert(0, self.fileData[rowNum][columnNum])
+                            assessment_entry.grid(row = rowNum,
+                                            column = columnNum)
+                            self.fileData[rowNum][columnNum] = assessment_entry
+                        else:
+                            tk.Label(self.center_frame, 
+                                    text = row[0], 
+                                    borderwidth = 1, 
+                                    relief = "solid", 
+                                    fg = "black", 
+                                    bg = "white", 
+                                    font = ('arial', 11), 
+                                    width = 93, 
+                                    anchor = "w",
+                                    ).grid(row = rowNum, 
+                                            column = columnNum, 
+                                            sticky = "W")
 
                 ################################################################################
                 #                               Middle Columns                                 #
@@ -91,36 +103,49 @@ class PageTwo(tk.Frame):
             
                 # Placing Assessment Buttons in the appropriate locations.  
                 elif columnNum <= len(row) -3:
-            
-                # Placing Assessment Buttons in the appropriate locations 
-                    try:
-                        value = row[columnNum]
-                        
-                        if value.isspace() or len(value) == 0:
-                            pass
-                        else:
-                            int(value)
-                        
-                        if self.assessmentLine == True:    
-                            newButton = InputButton(self.center_frame, 
-                                                    text = value, 
-                                                    x = rowNum,
-                                                    y = columnNum)
-                            self.fileData[rowNum][columnNum] = newButton
+                    if columnNum == 1 and self.applicationRows != True:
+                        tk.Label(self.center_frame, 
+                                text = row[columnNum], 
+                                borderwidth = 1, 
+                                relief = "solid", 
+                                fg = "black", 
+                                bg = "white", 
+                                font = ('arial', 11), 
+                                width = 10, 
+                                anchor = "w",
+                                ).grid(row = rowNum, 
+                                        column = columnNum, 
+                                        sticky = "W")
+                    else:
+                        # Placing Assessment Buttons in the appropriate locations 
+                        try:
+                            value = row[columnNum]
                             
-                        else:
-                            int("Force ValueError")
+                            if value.isspace() or len(value) == 0:
+                                pass
+                            else:
+                                int(value)
                             
-                    except ValueError:
-                        tk.Label(self.center_frame,
-                                text = value,
-                                fg = "black",
-                                bg = "white",
-                                borderwidth = 1,
-                                relief = "solid",
-                                width = 13,
-                                ).grid(row = rowNum,
-                                        column = columnNum)
+                            if self.assessmentLine == True:
+                                newButton = InputButton(self.center_frame, 
+                                                        text = value, 
+                                                        x = rowNum,
+                                                        y = columnNum)
+                                self.fileData[rowNum][columnNum] = newButton
+                                
+                            else:
+                                int("Force ValueError")
+                                
+                        except ValueError:
+                            tk.Label(self.center_frame,
+                                    text = value,
+                                    fg = "black",
+                                    bg = "white",
+                                    borderwidth = 1,
+                                    relief = "solid",
+                                    width = 13,
+                                    ).grid(row = rowNum,
+                                            column = columnNum)
                 # For the Note Column
                 else:
                     self.drawNoteBox(rowNum, columnNum)

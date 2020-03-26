@@ -221,7 +221,7 @@ class PageOne(tk.Frame):
         when populating the labels
         '''
 
-        for rowNum in range(len(self.fileData)):
+        for rowNum in range(self.lineBreak):
             row = self.fileData[rowNum]
             for columnNum in range(len(row)):
                 value = row[columnNum]
