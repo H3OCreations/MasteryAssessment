@@ -7,6 +7,8 @@ from datetime import datetime
 # Custom package import
 from AssessmentMainPage import *
 from MasteryTools import *
+from DropDownMenu import *
+from InputButton import *
 
 class MainMenu(tk.Tk):
     def __init__(self, *args, **kwargs):
@@ -75,77 +77,77 @@ class MainMenu(tk.Tk):
         delim1 = (classListPath[::-1]).index("/")
         delim2 = len(classListPath) - classListPath.index("_")
         className = classListPath[-delim1:-delim2]
-        classDirectory = unitDirectory + "\\" + className
-        
-        # Function is protected within the initialization function (for some reason, I decided this)
-        # The reason is probably to reuse the variables within the initialize function
-        def cleanData(fileName):
-            '''
-            The function takes in the target .csv file and removes all the formatting from the
-            direct copy and paste from word to excel.  It also ensures that all  rows are the 
-            exact same length 
-            '''
-            with open(fileName , encoding = "utf-8", errors = "ignore") as file:
-                fileReader = csv.reader(file)
-                fileData = list(fileReader)
-
-                # Removes all unicode and utf-8 from strings
-                for row in fileData:
-                    (column.encode("ascii", "ignore").decode("ascii") for column in row)
-                
-                # Removes blank rows
-                if (max(len(i) for i in row)) == 0:
-                    del fileData[fileData.index(row)]
-
-                for i in range(0, len(fileData)):
-                    if "-" in fileData[i][0]:
-                        if "-" in fileData[i][0][:3]:
-                            fileData[i][0] = fileData[i][0].replace("-", "~", 1)
-            
-            return fileData
-
-        # Also one of the protected functions within the initialize function
-        def writeFiles(assessmentData, classList):
-            '''
-            The function copies the cleaned assessment chart and renames them the student name
-            '''
-            assessmentData = cleanData(assessmentData)
-            
-            with open(classList, "r") as file:
-                classReader = csv.reader(file)
-                classData = list(classReader)      
-                file.close()
-            
-            for line in classData[1:]:
-                fileName = classDirectory + "\\" + str(line[2] + ", " + line[1] + ".csv")
-                
-                # Formatting the Assessment Charts
-                newFile = open(fileName, "a")
-                writer = csv.writer(newFile, delimiter = ",", quoting = csv.QUOTE_MINIMAL)
-                for row in assessmentData:
-                    writer.writerow(row)
-                newFile.close()     
-
-            # Cloning a random file to get around the current saving issue    
-            shutil.copyfile(fileName, classDirectory + "\\AAAAA_Template.csv")
+        self.classDirectory = unitDirectory + "\\" + className
         
         # Here is where we create the file directories
         try:
             os.mkdir(unitDirectory)
             try:
-                os.mkdir(classDirectory)
-                writeFiles(chartTemplatePath, classListPath)
+                os.mkdir(self.classDirectory)
+                self.writeFiles(chartTemplatePath, classListPath)
                 tk.messagebox.showinfo("Done", "Initialization Complete!")  
             except FileExistsError:
                 tk.messagebox.showinfo("Alert", "This unit has already been created.  To reinitialize a unit, you must delete the %s class folder" %(className))
 
         except FileExistsError:
             try:
-                os.mkdir(classDirectory)
-                writeFiles(chartTemplatePath, classListPath)
+                os.mkdir(self.classDirectory)
+                self.writeFiles(chartTemplatePath, classListPath)
 
             except FileExistsError:
                 tk.messagebox.showinfo("Alert", "This unit has already been created.  To reinitialize a unit, you must delete the %s folder" %(unitName))
+    
+    def cleanData(self, fileName):
+        '''
+        The function takes in the target .csv file and removes all the formatting from the
+        direct copy and paste from word to excel.  It also ensures that all  rows are the 
+        exact same length 
+        '''
+
+        with open(fileName , encoding = "utf-8", errors = "ignore") as file:
+            fileReader = csv.reader(file)
+            fileData = list(fileReader)
+
+            # Removes all unicode and utf-8 from strings
+            for row in fileData:
+                (column.encode("ascii", "ignore").decode("ascii") for column in row)
+            
+            # Removes blank rows
+            if (max(len(i) for i in row)) == 0:
+                del fileData[fileData.index(row)]
+
+            for i in range(0, len(fileData)):
+                if "-" in fileData[i][0]:
+                    if "-" in fileData[i][0][:3]:
+                        fileData[i][0] = fileData[i][0].replace("-", "~", 1)
+        return fileData
+
+    
+    def writeFiles(self, assessmentData, classList):
+        '''
+        The function cleans the assessment chart that was inputted and then proceeds to 
+        name each file based on each student name in the class list
+        '''
+        
+        assessmentData = self.cleanData(assessmentData)
+        
+        with open(classList, "r") as file:
+            classReader = csv.reader(file)
+            classData = list(classReader)      
+            file.close()
+        
+        for line in classData[1:]:
+            fileName = self.classDirectory + "\\" + str(line[2] + ", " + line[1] + ".csv")
+            
+            # Formatting the Assessment Charts
+            newFile = open(fileName, "a")
+            writer = csv.writer(newFile, delimiter = ",", quoting = csv.QUOTE_MINIMAL)
+            for row in assessmentData:
+                writer.writerow(row)
+            newFile.close()     
+
+        # Cloning a random file to get around the current saving issue    
+        shutil.copyfile(fileName, self.classDirectory + "\\AAAAA_Template.csv")
         
     def listSections(self):
         '''
@@ -197,7 +199,7 @@ class MainMenu(tk.Tk):
 
     def populateSectionMenu(self, event):
         '''Creates drop down menu for the list of classes'''
-        
+
         tk.Label(self.center_frame, 
         text = "Select The Section, then Click OK", 
         bg = "black", 

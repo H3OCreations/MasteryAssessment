@@ -1,6 +1,7 @@
 import os, csv, math, random, sys
 import tkinter as tk
-from InputTools import *
+from DropDownMenu import *
+from InputButton import *
 
 class PageTwo(tk.Frame):
     
