@@ -35,7 +35,7 @@ class MainMenu(tk.Tk):
         self.directoryList = self.listSections()
 
         initButton = tk.Button(self.center_frame, text = "Initialize Unit", width = 15, pady = 10)
-        initButton.bind("<Button-1>", self.initialize)
+        initButton.bind("<Button-1>", self.initializeFile)
         initButton.grid(row = 1)
 
         recordButton = tk.Button(self.center_frame, text = "Record Assessment", width = 15, pady = 10)
@@ -54,7 +54,7 @@ class MainMenu(tk.Tk):
         self.withdraw()
         self.destroy()
 
-    def initialize(self, event):
+    def initializeFile(self, event):
         '''
         Initializes directories by creating file structures the program will use 
         for the program itself
@@ -148,11 +148,16 @@ class MainMenu(tk.Tk):
                 tk.messagebox.showinfo("Alert", "This unit has already been created.  To reinitialize a unit, you must delete the %s folder" %(unitName))
         
     def listSections(self):
-        
-        #Export Format
-        #Unit                                       | Unit               
-        #{section: classlist, section: classlist}   |   {section: classlist, section: classlist} 
-        
+        '''
+        Creates a dictionary containing an organized structure of the directories.  The outer most 
+        dictionary has keys for the units (unit 1, unit 2, unit 3...)
+        The values of these keys are sepreate dictionaries in the format: <course-code>:<classlist>
+
+        Visualization of the data structure is below:
+        Unit                                       | Unit               
+        {section: classlist, section: classlist}   |   {section: classlist, section: classlist} 
+        '''
+
         unitList = os.listdir(self.subdirectories[0])
         sectionRow = []
         sectionGroups = []
@@ -168,6 +173,11 @@ class MainMenu(tk.Tk):
         return df
     
     def recordData(self, event):
+        '''
+        Generates appropriate drop down menues to select the desired charts and allows the user
+        to select which unit they wish to input marks
+        '''
+
         tk.Label(self.center_frame, 
                 text = "Select The Unit, then Click OK", 
                 bg = "black", 
@@ -185,8 +195,9 @@ class MainMenu(tk.Tk):
         okButton.bind("<Button-1>", self.populateSectionMenu)
         okButton.grid(row = 4, column = 2)
 
-
     def populateSectionMenu(self, event):
+        '''Creates drop down menu for the list of classes'''
+        
         tk.Label(self.center_frame, 
         text = "Select The Section, then Click OK", 
         bg = "black", 
@@ -202,16 +213,18 @@ class MainMenu(tk.Tk):
         okButton.grid(row = 4, column = 3)
 
     def populateAssessmentChart(self, event):
+        ''' Generates the list of files and directory locations in order to generate the charts'''
+
         unitChart = self.unitMenu.selected
         classSection = self.sectionMenu.selected
         classList = self.directoryList[2][self.directoryList[0].index(unitChart)].get(classSection)
         classPath = os.getcwd() + "\\Units\\" + unitChart + "\\"  + classSection
         self.destroy()
         configInfo = [unitChart, classSection, classList]
-        app = AssessmentPage(classPath, configInfo)
+        app = AssessmentMainPage(classPath, configInfo)
 
     def calculateData(self, event):
-        ''' Export csv with all calculated marks'''
+        ''' Export csv with all calculated marks of a selected directory'''
         
         # Identifies path for calculations to execute
         tk.messagebox.showinfo("Alert", "Select the folder witht he class's unit you wish to calculate")  
@@ -225,12 +238,15 @@ class MainMenu(tk.Tk):
         # Backing up data into archive directory
         archiveName = datetime.now()
         archiveName = archiveName.strftime("%Y-%m-%d-(%H-%M)") 
+
         try:
             backupName = self.subdirectories[1] + "\\" + archiveName 
             #os.mkdir(backupName)
             shutil.copytree(unitPath, backupName)
+
         except FileExistsError:
             response = tk.messagebox.askquestion("Archive Error", "Your Data has been archived today already.  Would you like to override today's existing archive?")
+            
             # If user clicks 'Yes' then it returns "yes" else it returns 'no'
             if response == "yes":
                 shutil.rmtree(backupName)

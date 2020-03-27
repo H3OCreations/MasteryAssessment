@@ -5,7 +5,7 @@ from AssessmentPageOne import *
 from AssessmentPageTwo import *
 
 
-class AssessmentPage(tk.Tk):
+class AssessmentMainPage(tk.Tk):
 
     def __init__(self, path, chartConfig, *args, **kwargs):
         tk.Tk.__init__(self, *args, **kwargs)
